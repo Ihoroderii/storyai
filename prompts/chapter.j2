@@ -1,0 +1,23 @@
+Write chapter {{ chapter_number }} in light novel style.
+
+BIBLE (JSON):
+{{ bible_json }}
+
+OUTLINE ITEM:
+{{ chapter_plan_json }}
+
+RECENT SUMMARIES:
+{% for ch, s in recent_summaries %}
+- Ch {{ ch }}: {{ s }}
+{% endfor %}
+
+CANON FACTS (do not contradict):
+{% for f in canon_facts %}
+- {{ f }}
+{% endfor %}
+
+Constraints:
+- 1800 to 2800 words (soft target)
+- end with the hook from the plan
+- keep POV consistent with plan
+Return ONLY the chapter text (no JSON).

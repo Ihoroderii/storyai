@@ -1,0 +1,20 @@
+Summarize and extract canon updates. Output ONLY valid JSON, no markdown.
+
+Chapter number: {{ chapter_number }}
+Chapter text:
+{{ chapter_text }}
+
+Required JSON structure:
+{
+  "chapter": {{ chapter_number }},
+  "summary_short": "3-5 sentences summarizing key events",
+  "summary_detailed": "8-15 sentences with more detail",
+  "new_facts": ["Fact 1", "Fact 2", "Fact 3"]
+}
+
+Facts should be:
+- Objective (not opinions)
+- Useful for continuity (relationships, rules, injuries, items, promises)
+- Specific and concrete
+
+Output ONLY the JSON, nothing else.

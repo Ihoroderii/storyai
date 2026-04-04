@@ -1,0 +1,27 @@
+You are creating a volume outline. Output ONLY valid JSON, no markdown.
+
+Input Bible (JSON):
+{{ bible_json }}
+
+Create exactly this JSON structure:
+{
+  "volume_title": "Volume 1: [Your Title]",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Chapter Title",
+      "goal": "What this chapter achieves",
+      "conflict": "Main challenge",
+      "twist": "Unexpected turn",
+      "hook": "Cliffhanger ending",
+      "pov": "Character Name"
+    }
+  ]
+}
+
+Requirements:
+- Make exactly 10 chapters (number 1-10)
+- volume_title is REQUIRED
+- Each chapter needs all 7 fields
+- Keep hooks compelling
+- Output ONLY the JSON, nothing else

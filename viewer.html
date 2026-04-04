@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Novel Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 40px;
+            min-height: 500px;
+            line-height: 1.8;
+        }
+
+        .chapter-nav {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .chapter-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .chapter-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .chapter-btn.active {
+            background: #764ba2;
+        }
+
+        .chapter-text {
+            font-size: 1.1em;
+            white-space: pre-wrap;
+        }
+
+        .chapter-text h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .json-view {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .json-view pre {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .character-card {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .character-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .outline-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #764ba2;
+        }
+
+        .outline-item h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: #d32f2f;
+            padding: 20px;
+            background: #ffebee;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .footer {
+            background: #2d2d2d;
+            color: #fff;
+            padding: 30px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .footer p {
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        .copyright-notice {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .copyright-notice h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .copyright-notice p {
+            color: #856404;
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.3;
+            pointer-events: none;
+            font-size: 0.8em;
+            color: #667eea;
+            transform: rotate(-45deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="novelTitle">Light Novel Viewer</h1>
+            <p id="novelGenre">Loading...</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('bible')">📖 World Bible</button>
+            <button class="tab" onclick="showTab('outline')">📋 Outline</button>
+            <button class="tab" onclick="showTab('chapters')">📚 Read Chapters</button>
+        </div>
+
+        <div class="content">
+            <div id="bible-content" class="tab-content">
+                <div class="copyright-notice">
+                    <h4>⚖️ Copyright Notice</h4>
+                    <p>© <span id="copyright-year"></span> All Rights Reserved.</p>
+                    <p>This work is protected by copyright law. Unauthorized reproduction, distribution, or commercial use is strictly prohibited.</p>
+                    <p>Generated using AI - All content is original and owned by the creator.</p>
+                </div>
+                <div class="loading">Loading world bible...</div>
+            </div>
+
+            <div id="outline-content" class="tab-content" style="display: none;">
+                <div class="loading">Loading outline...</div>
+            </div>
+
+            <div id="chapters-content" class="tab-content" style="display: none;">
+                <div class="loading">Loading chapters...</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>⚖️ Copyright & Usage Terms</strong></p>
+            <p>© <span class="copyright-year"></span> All Rights Reserved. This light novel and all its content are protected by international copyright law.</p>
+            <p>📖 For Personal Reading Only | ❌ Commercial Use Prohibited | ❌ No Redistribution</p>
+            <p style="margin-top: 15px; font-size: 0.85em; opacity: 0.7;">
+                Generated with AI assistance. All characters, plot, and world-building are original works.
+            </p>
+        </div>
+    </div>
+
+    <div class="watermark">
+        © <span class="copyright-year"></span> - All Rights Reserved
+    </div>
+
+    <script>
+        let bible = null;
+        let outline = null;
+        let chapters = {};
+
+        // Load all data
+        async function loadData() {
+            try {
+                // Load bible
+                const bibleRes = await fetch('data/bible.json');
+                bible = await bibleRes.json();
+                document.getElementById('novelTitle').textContent = bible.title;
+                document.getElementById('novelGenre').textContent = bible.genre;
+                renderBible();
+
+                // Load outline
+                const outlineRes = await fetch('data/outline.json');
+                outline = await outlineRes.json();
+                renderOutline();
+
+                // Load chapters
+                await loadChapters();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.querySelector('.loading').innerHTML = 
+                    '<div class="error">❌ Error loading data. Make sure you have run <code>python main.py</code> first!</div>';
+            }
+        }
+
+        async function loadChapters() {
+            try {
+                const chapterFiles = [];
+                // Try to load chapters 1-10
+                for (let i = 1; i <= 10; i++) {
+                    try {
+                        const response = await fetch(`data/chapters/`, {method: 'HEAD'});
+                        // We'll need to try different chapter files
+                        // For now, let's try a simple approach
+                    } catch (e) {
+                        // Ignore
+                    }
+                }
+                
+                // Try to discover all chapter files automatically
+                const possibleChapters = [
+                    '001_Rebooting_Reality.md',
+                    '002_Syntax_and_Sorcery.md',
+                    '003_The_Bug_Encounter.md',
+                    '004_Debugging_the_Past.md',
+                    '005_Compiler\'s_Secrets.md',
+                    '006_Rivals_and_Allies.md',
+                    '007_Into_the_Code_Abyss.md',
+                    '008_Confronting_Chaos.md',
+                    '009_Lines_of_Code.md',
+                    '010_Debugging_the_Future.md'
+                ];
+
+                for (const filename of possibleChapters) {
+                    try {
+                        const response = await fetch(`data/chapters/${filename}`);
+                        if (response.ok) {
+                            const text = await response.text();
+                            const chNum = parseInt(filename.split('_')[0]);
+                            chapters[chNum] = {
+                                filename: filename,
+                                text: text,
+                                title: filename.split('_').slice(1).join('_').replace('.md', '')
+                            };
+                        }
+                    } catch (e) {
+                        console.log(`Chapter ${filename} not found`);
+                    }
+                }
+
+                renderChapters();
+            } catch (error) {
+                console.error('Error loading chapters:', error);
+            }
+        }
+
+        function renderBible() {
+            const content = document.getElementById('bible-content');
+            
+            let html = `
+                <h2 style="color: #667eea; margin-bottom: 20px;">📖 ${bible.title}</h2>
+                <p style="font-size: 1.1em; margin-bottom: 20px;"><strong>Genre:</strong> ${bible.genre}</p>
+                <p style="font-size: 1.1em; margin-bottom: 30px;"><strong>Premise:</strong> ${bible.premise}</p>
+                
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">🌍 Setting</h3>
+                <p>${bible.setting}</p>
+                
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">⚡ Magic/System Rules</h3>
+                <ul style="padding-left: 30px;">
+                    ${bible.rules.map(rule => `<li style="margin: 8px 0;">${rule}</li>`).join('')}
+                </ul>
+                
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">🎭 Main Characters</h3>
+            `;
+            
+            bible.main_characters.forEach(char => {
+                html += `
+                    <div class="character-card">
+                        <h3>${char.name}${char.age ? ` (${char.age})` : ''} - ${char.role}</h3>
+                        ${char.goals.length ? `<p><strong>Goals:</strong> ${char.goals.join(', ')}</p>` : ''}
+                        ${char.personality.length ? `<p><strong>Personality:</strong> ${char.personality.join(', ')}</p>` : ''}
+                        ${char.speech_style.length ? `<p><strong>Speech Style:</strong> ${char.speech_style.join(', ')}</p>` : ''}
+                    </div>
+                `;
+            });
+            
+            html += `
+                <h3 style="color: #667eea; margin: 30px 0 15px 0;">🎨 Themes</h3>
+                <p>${bible.themes.join(', ')}</p>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        function renderOutline() {
+            const content = document.getElementById('outline-content');
+            
+            let html = `<h2 style="color: #764ba2; margin-bottom: 20px;">📋 ${outline.volume_title}</h2>`;
+            
+            outline.chapters.forEach(chapter => {
+                html += `
+                    <div class="outline-item">
+                        <h3>Chapter ${chapter.number}: ${chapter.title}</h3>
+                        <p><strong>POV:</strong> ${chapter.pov}</p>
+                        <p><strong>Goal:</strong> ${chapter.goal}</p>
+                        <p><strong>Conflict:</strong> ${chapter.conflict}</p>
+                        <p><strong>Twist:</strong> ${chapter.twist}</p>
+                        <p><strong>Hook:</strong> ${chapter.hook}</p>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+        }
+
+        function renderChapters() {
+            const content = document.getElementById('chapters-content');
+            
+            if (Object.keys(chapters).length === 0) {
+                content.innerHTML = '<div class="error">No chapters found. Run <code>python main.py</code> to generate chapters.</div>';
+                return;
+            }
+            
+            let html = '<div class="chapter-nav">';
+            Object.keys(chapters).sort((a, b) => a - b).forEach(chNum => {
+                html += `<button class="chapter-btn" onclick="showChapter(${chNum})">Chapter ${chNum}</button>`;
+            });
+            html += '</div>';
+            html += '<div id="chapter-display"></div>';
+            
+            content.innerHTML = html;
+            
+            // Show first chapter
+            showChapter(Object.keys(chapters)[0]);
+        }
+
+        function showChapter(chNum) {
+            const chapter = chapters[chNum];
+            const display = document.getElementById('chapter-display');
+            
+            // Update button states
+            document.querySelectorAll('.chapter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            display.innerHTML = `<div class="chapter-text">${chapter.text}</div>`;
+        }
+
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(`${tabName}-content`).style.display = 'block';
+        }
+
+        // Set copyright year
+        function setCopyrightYear() {
+            const year = new Date().getFullYear();
+            document.getElementById('copyright-year').textContent = year;
+            document.querySelectorAll('.copyright-year').forEach(el => {
+                el.textContent = year;
+            });
+        }
+
+        // Load data on page load
+        setCopyrightYear();
+        loadData();
+    </script>
+</body>
+</html>

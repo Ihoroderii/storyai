@@ -1,0 +1,50 @@
+# Robots.txt - Prevent unauthorized scraping and AI training
+
+# Block all AI/ML training crawlers
+User-agent: CCBot
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Omgilibot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+# Block content scrapers
+User-agent: HTTrack
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: archive.org_bot
+Disallow: /
+
+# Block ALL bots from chapters and data
+User-agent: *
+Disallow: /data/
+Disallow: /data/chapters/
+Disallow: /*.md$
+Disallow: /*.json$
+
+# Copyright notice
+# All content is protected by copyright law
+# Unauthorized scraping, reproduction, or AI training use is prohibited

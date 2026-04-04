@@ -1,0 +1,32 @@
+You are writing a light novel "bible". Output ONLY valid JSON, no markdown.
+
+Premise: {{ premise }}
+Genre: {{ genre }}
+
+Required JSON structure:
+{
+  "title": "Novel Title",
+  "genre": "{{ genre }}",
+  "premise": "{{ premise }}",
+  "setting": "Detailed world description",
+  "rules": ["Magic/system rule 1", "Rule 2", ...],
+  "themes": ["Theme 1", "Theme 2", ...],
+  "main_characters": [
+    {
+      "name": "Character Name",
+      "age": 25,
+      "role": "protagonist/antagonist/mentor",
+      "goals": ["Goal 1", "Goal 2"],
+      "fears": ["Fear 1"],
+      "personality": ["Trait 1", "Trait 2"],
+      "speech_style": ["Style 1"],
+      "relationships": {"OtherCharName": "relationship description"}
+    }
+  ],
+  "style_guide": ["Writing style note 1", "Style note 2"]
+}
+
+Requirements:
+- Create 4-6 main characters
+- Keep magic/system rules clear and restrictive
+- Output ONLY the JSON, nothing else
