@@ -1,4 +1,5 @@
-You are writing a light novel "bible". Output ONLY valid JSON, no markdown.
+You are writing a light novel "bible" that serves BOTH narrative and visual adaptation.
+Output ONLY valid JSON, no markdown.
 
 Premise: {{ premise }}
 Genre: {{ genre }}
@@ -9,24 +10,72 @@ Required JSON structure:
   "genre": "{{ genre }}",
   "premise": "{{ premise }}",
   "setting": "Detailed world description",
-  "rules": ["Magic/system rule 1", "Rule 2", ...],
-  "themes": ["Theme 1", "Theme 2", ...],
+  "rules": ["Magic/system rule 1", "Rule 2"],
+  "themes": ["Theme 1", "Theme 2"],
   "main_characters": [
     {
       "name": "Character Name",
       "age": 25,
-      "role": "protagonist/antagonist/mentor",
+      "role": "protagonist/antagonist/mentor/supporting character",
       "goals": ["Goal 1", "Goal 2"],
       "fears": ["Fear 1"],
       "personality": ["Trait 1", "Trait 2"],
       "speech_style": ["Style 1"],
-      "relationships": {"OtherCharName": "relationship description"}
+      "relationships": {"OtherCharName": "relationship description"},
+      "visual": {
+        "hair_color": "bright blue",
+        "hair_style": "long, straight, past shoulders",
+        "eye_color": "emerald green",
+        "face_shape": "soft oval face, pointed chin",
+        "skin_tone": "fair",
+        "age_appearance": "early 20s",
+        "body_type": "slim athletic",
+        "silhouette": "lean and angular, narrow shoulders, slightly taller than average",
+        "height": "170cm / average",
+        "outfit_base": "dark tunic with glowing code symbols, knee-high boots",
+        "signature_prop": "crystal staff with shifting code runes",
+        "expression_style": "bright, energetic smile; sharp focused stare when casting",
+        "distinguishing_features": ["scar on left cheek", "glowing tattoo on forearm"],
+        "props": ["crystal staff", "leather satchel"],
+        "color_palette": ["#2E86C1", "#1A5276", "#D4AC0D"],
+        "reference_prompt": "young woman, bright blue long straight hair, emerald eyes, soft oval face, dark tunic with glowing symbols, slim athletic build, crystal staff, energetic expression style, Korean manhwa style"
+      }
+    }
+  ],
+  "locations": [
+    {
+      "location_id": "forest_of_algorithms",
+      "name": "Forest of Algorithms",
+      "description": "Dense forest where trees are made of shifting code, branches glow with data streams",
+      "anchor_objects": ["data river", "code trees", "floating terminals"],
+      "lighting": "dappled green-blue bioluminescence",
+      "mood": "mysterious, alive",
+      "time_of_day": "perpetual twilight",
+      "palette": ["#0B5345", "#1ABC9C", "#2ECC71"],
+      "layout_notes": "narrow paths between towering algorithm-trees, clearings near data rivers",
+      "layout": {
+        "left_landmark": "towering algorithm-tree with glowing bark",
+        "right_landmark": "data river flowing with luminous code",
+        "center_landmark": "moss-covered stone terminal",
+        "depth_order": ["foreground path", "mid-ground trees", "background data waterfall"],
+        "entrance_points": ["narrow path from the south", "river crossing from the east"]
+      },
+      "allowed_camera_angles": ["eye level", "low angle", "dutch angle"]
     }
   ],
   "style_guide": ["Writing style note 1", "Style note 2"]
 }
 
 Requirements:
-- Create 4-6 main characters
+- Create 4-6 main characters with COMPLETE visual profiles
+- Visual profiles are CANON: every chapter must respect them exactly
+- hair_color, eye_color, face_shape, expression_style, outfit_base, silhouette, and reference_prompt are REQUIRED for each character
+- signature_prop is the ONE most recognizable item the character always carries
+- reference_prompt should be a concise, stable image-generation prompt for the character and must reflect face shape and expression style
+- Outfits must match the genre setting (fantasy outfits for fantasy worlds, no modern clothing unless the world has it)
+- Create 3-6 key locations with full visual anchors and spatial layout
+- Each location must define left/right/center landmarks and depth ordering for camera consistency
+- allowed_camera_angles restricts which angles make sense at this location (3-5 per location)
+- location_id must be lowercase_snake_case
 - Keep magic/system rules clear and restrictive
 - Output ONLY the JSON, nothing else

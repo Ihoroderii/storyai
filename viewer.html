@@ -204,6 +204,23 @@
             font-size: 0.95em;
         }
 
+        .manga-chapter-img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin: 20px 0;
+        }
+
+        .manga-notice {
+            background: #e8eaf6;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            color: #333;
+        }
+
         .watermark {
             position: fixed;
             bottom: 20px;
@@ -224,9 +241,10 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="showTab('bible')">📖 World Bible</button>
-            <button class="tab" onclick="showTab('outline')">📋 Outline</button>
-            <button class="tab" onclick="showTab('chapters')">📚 Read Chapters</button>
+            <button class="tab active" data-tab="bible" onclick="showTab('bible')">📖 World Bible</button>
+            <button class="tab" data-tab="outline" onclick="showTab('outline')">📋 Outline</button>
+            <button class="tab" data-tab="chapters" onclick="showTab('chapters')">📚 Read Chapters</button>
+            <button class="tab" data-tab="manga" onclick="showTab('manga')">🎨 Manga</button>
         </div>
 
         <div class="content">
@@ -246,6 +264,10 @@
 
             <div id="chapters-content" class="tab-content" style="display: none;">
                 <div class="loading">Loading chapters...</div>
+            </div>
+
+            <div id="manga-content" class="tab-content" style="display: none;">
+                <div class="loading">Loading manga...</div>
             </div>
         </div>
 
@@ -267,6 +289,7 @@
         let bible = null;
         let outline = null;
         let chapters = {};
+        let mangaChapters = {};
 
         // Load all data
         async function loadData() {
@@ -285,6 +308,9 @@
 
                 // Load chapters
                 await loadChapters();
+
+                // Load manga
+                await loadManga();
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.querySelector('.loading').innerHTML = 
@@ -294,39 +320,21 @@
 
         async function loadChapters() {
             try {
-                const chapterFiles = [];
-                // Try to load chapters 1-10
-                for (let i = 1; i <= 10; i++) {
-                    try {
-                        const response = await fetch(`data/chapters/`, {method: 'HEAD'});
-                        // We'll need to try different chapter files
-                        // For now, let's try a simple approach
-                    } catch (e) {
-                        // Ignore
-                    }
-                }
-                
-                // Try to discover all chapter files automatically
-                const possibleChapters = [
-                    '001_Rebooting_Reality.md',
-                    '002_Syntax_and_Sorcery.md',
-                    '003_The_Bug_Encounter.md',
-                    '004_Debugging_the_Past.md',
-                    '005_Compiler\'s_Secrets.md',
-                    '006_Rivals_and_Allies.md',
-                    '007_Into_the_Code_Abyss.md',
-                    '008_Confronting_Chaos.md',
-                    '009_Lines_of_Code.md',
-                    '010_Debugging_the_Future.md'
-                ];
+                // Build filenames from the outline so new/renamed chapters are found automatically
+                const chapterSources = outline
+                    ? outline.chapters.map(ch => {
+                        const num = String(ch.number).padStart(3, '0');
+                        const slug = ch.title.replace(/ /g, '_');
+                        return { num: ch.number, filename: `${num}_${slug}.md` };
+                    })
+                    : [];
 
-                for (const filename of possibleChapters) {
+                for (const { num, filename } of chapterSources) {
                     try {
                         const response = await fetch(`data/chapters/${filename}`);
                         if (response.ok) {
                             const text = await response.text();
-                            const chNum = parseInt(filename.split('_')[0]);
-                            chapters[chNum] = {
+                            chapters[num] = {
                                 filename: filename,
                                 text: text,
                                 title: filename.split('_').slice(1).join('_').replace('.md', '')
@@ -412,7 +420,7 @@
             
             let html = '<div class="chapter-nav">';
             Object.keys(chapters).sort((a, b) => a - b).forEach(chNum => {
-                html += `<button class="chapter-btn" onclick="showChapter(${chNum})">Chapter ${chNum}</button>`;
+                html += `<button class="chapter-btn" data-chapter="${chNum}" onclick="showChapter(${chNum})">Chapter ${chNum}</button>`;
             });
             html += '</div>';
             html += '<div id="chapter-display"></div>';
@@ -426,28 +434,72 @@
         function showChapter(chNum) {
             const chapter = chapters[chNum];
             const display = document.getElementById('chapter-display');
-            
-            // Update button states
+
             document.querySelectorAll('.chapter-btn').forEach(btn => {
                 btn.classList.remove('active');
+                if (btn.dataset.chapter == chNum) btn.classList.add('active');
             });
-            event.target.classList.add('active');
-            
+
             display.innerHTML = `<div class="chapter-text">${chapter.text}</div>`;
         }
 
         function showTab(tabName) {
-            // Update tab buttons
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
+                if (tab.dataset.tab === tabName) tab.classList.add('active');
             });
-            event.target.classList.add('active');
-            
-            // Update content
+
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.style.display = 'none';
             });
             document.getElementById(`${tabName}-content`).style.display = 'block';
+        }
+
+        async function loadManga() {
+            if (!outline) return;
+            for (const ch of outline.chapters) {
+                const num = String(ch.number).padStart(3, '0');
+                const imgUrl = `data/manga/chapter_${num}/chapter.png`;
+                try {
+                    const res = await fetch(imgUrl, { method: 'HEAD' });
+                    if (res.ok) {
+                        mangaChapters[ch.number] = imgUrl;
+                    }
+                } catch (e) { /* not generated yet */ }
+            }
+            renderManga();
+        }
+
+        function renderManga() {
+            const content = document.getElementById('manga-content');
+            const nums = Object.keys(mangaChapters).sort((a, b) => a - b);
+
+            if (nums.length === 0) {
+                content.innerHTML =
+                    '<div class="manga-notice">' +
+                    'No manga chapters found yet.<br>' +
+                    'Run <code>python generate_manga.py</code> to generate manga from your story chapters.' +
+                    '</div>';
+                return;
+            }
+
+            let html = '<div class="chapter-nav">';
+            nums.forEach(n => {
+                html += `<button class="chapter-btn manga-btn" data-manga="${n}" onclick="showMangaChapter(${n})">Chapter ${n}</button>`;
+            });
+            html += '</div><div id="manga-display"></div>';
+            content.innerHTML = html;
+            showMangaChapter(nums[0]);
+        }
+
+        function showMangaChapter(chNum) {
+            document.querySelectorAll('.manga-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.manga == chNum) btn.classList.add('active');
+            });
+            const display = document.getElementById('manga-display');
+            const src = mangaChapters[chNum];
+            display.innerHTML = `<img class="manga-chapter-img" src="${src}" alt="Chapter ${chNum} manga">`;
         }
 
         // Set copyright year

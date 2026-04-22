@@ -66,15 +66,12 @@ def main():
     
     # Parse arguments
     if len(sys.argv) == 1:
-        # Generate next missing chapter
-        if not existing:
-            chapters_to_gen = [1]
-        else:
-            next_ch = max(existing) + 1
-            if next_ch > total_chapters:
-                print(f"\n🎉 All chapters already complete!")
-                return
-            chapters_to_gen = [next_ch]
+        # Generate next missing chapter (fills gaps first, then continues)
+        missing = sorted(ch for ch in range(1, total_chapters + 1) if ch not in existing)
+        if not missing:
+            print(f"\n🎉 All chapters already complete!")
+            return
+        chapters_to_gen = [missing[0]]
     
     elif "--all" in sys.argv:
         # Generate all missing chapters
@@ -119,7 +116,7 @@ def main():
         print(f"✅ Saved: {chapter_file.name}")
         
         print(f"📝 Summarizing chapter {ch}...")
-        summarize_and_store(env, db, draft)
+        summarize_and_store(env, db, draft, bible=bible)
         print(f"✅ Summary stored in database")
     
     # Final summary

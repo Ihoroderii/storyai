@@ -5,7 +5,7 @@ Usage: python check_similarity.py
 """
 
 from pathlib import Path
-from app.similarity import SimilarityChecker, print_similarity_report
+from app.similarity import SimilarityChecker
 
 
 BASE = Path(__file__).parent

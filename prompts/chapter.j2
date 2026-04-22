@@ -16,8 +16,24 @@ CANON FACTS (do not contradict):
 - {{ f }}
 {% endfor %}
 
+VISUAL CANON (character appearances are LOCKED — do not change them):
+{% for vc in visual_canon %}
+- {{ vc }}
+{% endfor %}
+
+{% if location_canon %}
+LOCATION CANON (recurring places — use consistent descriptions):
+{% for lc in location_canon %}
+- {{ lc }}
+{% endfor %}
+{% endif %}
+
 Constraints:
 - 1800 to 2800 words (soft target)
 - end with the hook from the plan
 - keep POV consistent with plan
+- when describing a character's appearance, use EXACTLY the visual details from the bible
+- do NOT change hair color, eye color, outfit, or distinguishing features from what the bible defines
+- when describing a recurring location, include its key anchor objects and lighting from the location canon
+- do NOT change the fundamental layout or atmosphere of established locations
 Return ONLY the chapter text (no JSON).

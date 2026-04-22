@@ -72,8 +72,13 @@ def main():
     env = get_env(str(PROMPTS))
     db = NovelDB(str(DATA / "novel.db"))
 
-    premise = "A tired IT engineer is reborn in a world where spells compile like code, and bugs become monsters."
-    genre = "Isekai fantasy / system"
+    config_file = BASE / "config.json"
+    if config_file.exists():
+        config = json.loads(config_file.read_text(encoding="utf-8"))
+    else:
+        config = {}
+    premise = config.get("premise", "A tired IT engineer is reborn in a world where spells compile like code, and bugs become monsters.")
+    genre = config.get("genre", "Isekai fantasy / system")
 
     # Load or generate bible and outline
     bible = load_or_generate_bible(env, premise, genre)
@@ -107,7 +112,7 @@ def main():
         print(f"✅ Saved: {chapter_file.name}")
         
         print(f"📝 Summarizing chapter {ch}...")
-        summarize_and_store(env, db, draft)
+        summarize_and_store(env, db, draft, bible=bible)
 
     print("\n✨ Done! Check data/ for outputs.")
     print(f"📚 Bible: {DATA / 'bible.json'}")
